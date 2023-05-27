@@ -101,7 +101,7 @@ function createRepository(data) {
   repositoryPreview.innerHTML = `
     <div class="preview">
       <p class="preview-text"><span>Name: ${data.name}</span></p>
-      <p class="preview-text"><span>Owner: ${data.topics}</span></p>
+      <p class="preview-text"><span>Owner: ${data.owner.login}</span></p>
       <p class="preview-text"><span>Stars: ${data.stargazers_count}</span></p>
     </div>
   `
