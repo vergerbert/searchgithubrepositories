@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 660px;
+  height: 541px;
+  margin: 50px auto;
+
+  background-color: #c4c4c4;
+}
+
+.search-form {
+  padding-top: 62px;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 505px;
+  height: 60px;
+
+  font-size: 48px;
+  padding-left: 13px;
+
+  outline: none;
+  border: none;
+}
+
+.search-repository {
+  margin-top: 45px;
+  margin-right: 40px;
+}
+
+.repository-preview {
+  display: flex;
+  align-items: center;
+
+  width: 519px;
+  height: 101px;
+
+  border: 1px solid black;
+  background-color: #E27BEB;
+}
+
+.preview {
+  padding-left: 16px;
+  width: 415px;
+
+  list-style-type: none;
+  font-size: 24px;
+  overflow: auto;
+}
+
+.preview-text {
+  margin: 0;
+}
+
+.close-button {
+  right: 31px;
+	width: 42px;
+	height: 42px;
+	cursor: pointer;
+
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+.search-dropdown {
+  margin-top: -16px;
+  margin-right: 40px;
+}
+
+.dropdown-preview {
+  width: 506px;
+  height: 44px;
+
+  padding-left: 13px;
+  font-size: 30px;
+
+  list-style-type: none;
+  cursor: pointer;
+
+  border: 1px solid black;
+  background: #E3E3E3;
+}
+
+.dropdown-preview:hover {
+  background: #65CDF9;
+}
