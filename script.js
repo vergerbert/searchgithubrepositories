@@ -37,17 +37,21 @@ searchDropdown.append(dropdownList)
 searchRepository.append(repositoryList)
 
 function createDeleteButton(item) {
-  const closeButton = createElement('button', 'close-button')
-  const closeImg = createElement('img', 'close-button-img')
-  closeImg.src = './svg/close.svg'
-
-  closeButton.append(closeImg)
-  closeButton.addEventListener('click', item => {
-    item.preventDefault()
-    closeButton.parentNode.remove(item)
-  })
-
-  return closeButton
+  try {
+    const closeButton = createElement('button', 'close-button')
+    const closeImg = createElement('img', 'close-button-img')
+    closeImg.src = './svg/close.svg'
+  
+    closeButton.append(closeImg)
+    closeButton.addEventListener('click', item => {
+      item.preventDefault()
+      closeButton.parentNode.remove(item)
+    })
+  
+    return closeButton
+  } catch(error) {
+    console.log(error)
+  }
 }
 
 /* ----------------------------------------------------- */
@@ -72,54 +76,70 @@ function clearDropdown() {
 /* ----------------------------------------------------- */
 
 function createDropdown(data) {
-  const dropdownPreview = createElement('li', 'dropdown-preview')
-  dropdownPreview.innerHTML = `<span>${data.name}</span>`
-  dropdownList.append(dropdownPreview)
-
-  dropdownPreview.addEventListener('click', generateRepository)
-  dropdownPreview.addEventListener('click', item => {
-    item.preventDefault()
-    dropdownPreview.parentNode.remove(dropdownPreview)
-  })
+  try {
+    const dropdownPreview = createElement('li', 'dropdown-preview')
+    dropdownPreview.innerHTML = `<span>${data.name}</span>`
+    dropdownList.append(dropdownPreview)
+  
+    dropdownPreview.addEventListener('click', generateRepository)
+    dropdownPreview.addEventListener('click', item => {
+      item.preventDefault()
+      dropdownPreview.parentNode.remove(dropdownPreview)
+    })
+  } catch(error) {
+    console.log(error)
+  }
 }
 
 const returnFunction = debounceInput(async function generateDropdown() {
-  clearDropdown()
-  if (searchInput.value) {
-    loading(searchInput.value, 5)
-    .then(response => {
-      response.json()
+  try {
+    clearDropdown()
+    if (searchInput.value) {
+      loading(searchInput.value, 5)
       .then(response => {
-        response.items.forEach(repository => createDropdown(repository))
+        response.json()
+        .then(response => {
+          response.items.forEach(repository => createDropdown(repository))
+        })
       })
-    })
+    }
+  } catch(error) {
+    console.log(error)
   }
-}, 230)
+}, 250)
 
 function createRepository(data) {
-  const repositoryPreview = createElement('li', 'repository-preview')
-  repositoryPreview.innerHTML = `
-    <div class="preview">
-      <p class="preview-text"><span>Name: ${data.name}</span></p>
-      <p class="preview-text"><span>Owner: ${data.owner.login}</span></p>
-      <p class="preview-text"><span>Stars: ${data.stargazers_count}</span></p>
-    </div>
-  `
-
-  repositoryList.append(repositoryPreview)
-  repositoryPreview.append(createDeleteButton(repositoryPreview))
+  try {
+    const repositoryPreview = createElement('li', 'repository-preview')
+    repositoryPreview.innerHTML = `
+      <div class="preview">
+        <p class="preview-text"><span>Name: ${data.name}</span></p>
+        <p class="preview-text"><span>Owner: ${data.owner.login}</span></p>
+        <p class="preview-text"><span>Stars: ${data.stargazers_count}</span></p>
+      </div>
+    `
+  
+    repositoryList.append(repositoryPreview)
+    repositoryPreview.append(createDeleteButton(repositoryPreview))
+  } catch(error) {
+    console.log(error)
+  }
 }
 
 async function generateRepository(element) {
-  element.preventDefault()
-  if (searchInput.value) {
-    loading(searchInput.value, 3)
-    .then(response => {
-      response.json()
+  try {
+    element.preventDefault()
+    if (searchInput.value) {
+      loading(searchInput.value, 1)
       .then(response => {
-        response.items.forEach(repository => createRepository(repository))
+        response.json()
+        .then(response => {
+          response.items.forEach(repository => createRepository(repository))
+        })
       })
-    })
+    }
+  } catch(error) {
+    console.log(error)
   }
 }
 
