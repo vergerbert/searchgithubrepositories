@@ -1,116 +1,109 @@
-/* ----------------------------------------------------- */
-
-const url = `https://api.github.com/search/repositories?q=`
-
 function querySelector(elementClass) {
-  const element = document.querySelector(elementClass)
-  return element
+  try {
+    return document.querySelector(elementClass)
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 function createElement(elementTag, elementClass) {
-  const element = document.createElement(elementTag)
-  if (elementClass) element.classList.add(elementClass)
-  return element
+  try {
+    const element = document.createElement(elementTag)
+    if (elementClass) element.classList.add(elementClass)
+    return element
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-/* ----------------------------------------------------- */
+function createAndAppendElement(parent, elementTag, elementClass) {
+  try {
+    const element = createElement(elementTag, elementClass)
+    parent.append(element)
+    return element
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 const main = querySelector('.main')
 
-const searchForm = createElement('form', 'search-form')
-const searchInput = createElement('input','search-input')
-const searchDropdown = createElement('div', 'search-dropdown')
-const searchRepository = createElement('div', 'search-repository')
+const searchForm = createAndAppendElement(main, 'form', 'search-form')
+const searchInput = createAndAppendElement(searchForm, 'input','search-input')
+const searchDropdown = createAndAppendElement(main, 'div', 'search-dropdown')
+const searchRepository = createAndAppendElement(main, 'div', 'search-repository')
 
 searchInput.setAttribute('name', 'name')
 searchInput.setAttribute('placeholder', 'Type to search...')
 
-const dropdownList = createElement('ul', 'dropdown-list')
-const repositoryList = createElement('ul', 'repository-list')
+const dropdownList = createAndAppendElement(searchDropdown, 'ul', 'dropdown-list')
+const repositoryList = createAndAppendElement(searchRepository, 'ul', 'repository-list')
 
-main.append(searchForm)
-main.append(searchDropdown)
-main.append(searchRepository)
+const url = `https://api.github.com/search/repositories?q=`
+let repositories
 
-searchForm.append(searchInput)
-searchDropdown.append(dropdownList)
-searchRepository.append(repositoryList)
+function debounce(fn, ms) {
+  let timeout
 
-function createDeleteButton(item) {
+  return function(...args) {
+    clearTimeout(timeout)
+
+    timeout = setTimeout(() => {
+      fn.apply(this, args)
+    }, ms)
+  }
+}
+
+function button() {
   try {
     const closeButton = createElement('button', 'close-button')
-    const closeImg = createElement('img', 'close-button-img')
+    const closeImg = createAndAppendElement(closeButton, 'img', 'close-button-img')
     closeImg.src = './svg/close.svg'
   
-    closeButton.append(closeImg)
-    closeButton.addEventListener('click', item => {
-      item.preventDefault()
-      closeButton.parentNode.remove(item)
+    closeButton.addEventListener('click', event => {
+      event.preventDefault()
+      closeButton.parentNode.remove()
     })
   
     return closeButton
-  } catch(error) {
+  } catch (error) {
     console.log(error)
   }
 }
 
-/* ----------------------------------------------------- */
-
-function debounceInput (fn, ms) {
-  let timeout
-
-  return function () {
-    clearTimeout(timeout)
-    timeout = setTimeout(() => fn.apply(this, arguments), ms)
-  }
-}
-
-async function loading(value, page) {
-    return await fetch(url + `${value}` + `&per_page=${page}`)
-}
-
-function clearDropdown() {
-  return dropdownList.innerHTML = ''
-}
-
-/* ----------------------------------------------------- */
-
-function createDropdown(data) {
+function createDropdown(repository, index) {
   try {
-    const dropdownPreview = createElement('li', 'dropdown-preview')
-    dropdownPreview.innerHTML = `<span>${data.name}</span>`
-    dropdownList.append(dropdownPreview)
-  
-    dropdownPreview.addEventListener('click', generateRepository)
-    dropdownPreview.addEventListener('click', item => {
-      item.preventDefault()
-      dropdownPreview.parentNode.remove(dropdownPreview)
+    const dropdownPreview = createAndAppendElement(dropdownList, 'li', 'dropdown-preview')
+    dropdownPreview.innerHTML = `<span>${repository.name}</span>`
+    dropdownPreview.classList.add(`dropdown-preview${index}`)
+
+    dropdownPreview.addEventListener('click', () => {
+      createRepository(repositories[index])
+      searchInput.value = ''
+      dropdownList.innerHTML = ''
     })
-  } catch(error) {
+  } catch (error) {
     console.log(error)
   }
 }
 
-const returnFunction = debounceInput(async function generateDropdown() {
+const generateDropdown = debounce(async () => {
   try {
-    clearDropdown()
-    if (searchInput.value) {
-      loading(searchInput.value, 5)
-      .then(response => {
-        response.json()
-        .then(response => {
-          response.items.forEach(repository => createDropdown(repository))
-        })
-      })
-    }
-  } catch(error) {
+    const response = await fetch(url + `${searchInput.value}` + `&per_page=${5}`)
+    const data = await response.json()
+    
+    repositories = data.items
+    repositories.forEach((repository, index) => createDropdown(repository, index))
+
+    return repositories
+  } catch (error) {
     console.log(error)
   }
 }, 250)
 
 function createRepository(data) {
   try {
-    const repositoryPreview = createElement('li', 'repository-preview')
+    const repositoryPreview = createAndAppendElement(repositoryList, 'li', 'repository-preview')
     repositoryPreview.innerHTML = `
       <div class="preview">
         <p class="preview-text"><span>Name: ${data.name}</span></p>
@@ -118,31 +111,11 @@ function createRepository(data) {
         <p class="preview-text"><span>Stars: ${data.stargazers_count}</span></p>
       </div>
     `
-  
-    repositoryList.append(repositoryPreview)
-    repositoryPreview.append(createDeleteButton(repositoryPreview))
-  } catch(error) {
+
+    repositoryPreview.append(button())
+  } catch (error) {
     console.log(error)
   }
 }
 
-async function generateRepository(element) {
-  try {
-    element.preventDefault()
-    if (searchInput.value) {
-      loading(searchInput.value, 1)
-      .then(response => {
-        response.json()
-        .then(response => {
-          response.items.forEach(repository => createRepository(repository))
-        })
-      })
-    }
-  } catch(error) {
-    console.log(error)
-  }
-}
-
-/* ----------------------------------------------------- */
-
-searchInput.addEventListener('keyup', returnFunction)
+searchInput.addEventListener('keyup', () => generateDropdown())
