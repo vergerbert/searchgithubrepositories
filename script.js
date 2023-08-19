@@ -93,6 +93,8 @@ const generateDropdown = debounce(async () => {
     const data = await response.json()
     
     repositories = data.items
+    dropdownList.innerHTML = ''
+
     repositories.forEach((repository, index) => createDropdown(repository, index))
 
     return repositories
